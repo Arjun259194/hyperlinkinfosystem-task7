@@ -1,11 +1,14 @@
 // Ingredient.js
-import mongoose from 'mongoose'
+import mongoose from "mongoose"
 
-const ingredientSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-}, {
-  timestamps: true,
-})
+const ingredientSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, unique: true },
+  },
+  {
+    timestamps: true,
+  },
+)
 
-const Ingredient = mongoose.model('Ingredient', ingredientSchema)
+const Ingredient = mongoose.model("Ingredient", ingredientSchema)
 export default Ingredient

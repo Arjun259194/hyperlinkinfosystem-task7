@@ -15,7 +15,7 @@ const orderItemSchema = new mongoose.Schema(
   },
   {
     _id: false, // optional: don't create separate _id for items
-  }
+  },
 )
 
 const orderSchema = new mongoose.Schema(
@@ -77,7 +77,7 @@ const orderSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  }
+  },
 )
 
 const Order = mongoose.model("Order", orderSchema)
