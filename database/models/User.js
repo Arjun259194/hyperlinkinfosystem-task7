@@ -13,8 +13,8 @@ const userSchema = new Schema(
     profile_image: { type: String },
     phone: { type: String, required: true, unique: true },
     default_address_id: { type: Types.ObjectId, ref: "Address" },
-    addresses: { type: [Types.ObjectId], ref: "Address" },
-    device_id: { type: Types.ObjectId, ref: "Device" },
+    addresses: { type: [Types.ObjectId], ref: "Address", default: [] },
+    device_id: { type: Types.ObjectId, ref: "Device", default: null},
     otp: { type: String, default: null, unique: true },
   },
   {

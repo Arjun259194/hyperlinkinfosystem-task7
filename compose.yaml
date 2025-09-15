@@ -6,7 +6,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo_root
       MONGO_INITDB_ROOT_PASSWORD: mongo_pw
-      MONGO_INITDB_DATABASE: food-app
+      MONGO_INITDB_DATABASE: news-app-database
     ports:
       - "27017:27017"
     volumes:

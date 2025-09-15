@@ -14,13 +14,13 @@ export function globalErrorHandler(err, req, res, _next) {
 
   const code = err?.code || 500
   const msg = err?.message || "Internal Server Error"
-  const obj = err?.obj
+  const obj = err?.obj || {}
 
   res.status(code).json({
     code,
     message: msg,
     success: false,
-    ...(!!obj ? obj : {}),
+    ...(obj),
   })
 }
 

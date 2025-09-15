@@ -1,8 +1,8 @@
-import { Schema, Types } from "mongoose"
+import mongoose from "mongoose"
 
-const deviceSchema = new Schema(
+const deviceSchema = new mongoose.Schema(
   {
-    user_id: { type: Types.ObjectId, required: true },
+    user_id: { type: mongoose.Types.ObjectId, required: true },
     token: { type: String, default: null },
     device_type: String,
     device_name: String,
@@ -14,9 +14,9 @@ const deviceSchema = new Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
+  }
 )
 
-const Device = model("Device", deviceSchema)
+const Device = mongoose.model("Device", deviceSchema)
 
 export default Device
