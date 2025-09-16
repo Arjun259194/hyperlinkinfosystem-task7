@@ -5,4 +5,6 @@ const restaurantRouter = Router()
 
 restaurantRouter.get("/", RestaurantController.get)
 
+restaurantRouter.get("/detailed")
+
 export default restaurantRouter

@@ -1,3 +1,5 @@
+import z from "zod"
+import Validate from "../../../../libs/zod.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
 import { PaginationValidation } from "../../validation.js"
 import { GetRestaurantsAsPerUser } from "../model/restaurantModel.js"
@@ -17,5 +19,10 @@ export default class RestaurantController {
       message: "restaurants found",
       data: restaurants,
     })
+  }
+
+  /** @type {ExpressFn} */
+  static async getById(req, res) {
+    const restaurant_id = Validate(z.string(), req.body?.restaurant_id)
   }
 }

@@ -50,18 +50,6 @@ export const GetRestaurantsAsPerUser = async (userId, page, limit) => {
   }
 }
 
-function calDis(lat1, lon1, lat2, lon2, R = 6371) {
-  return (
-    2 *
-    R *
-    Math.asin(
-      Math.sqrt(
-        Math.pow(Math.sin((Radian(lat2) - Radian(lat1)) / 2), 2) +
-          Math.cos(Radian(lat1)) *
-            Math.cos(Radian(lat2)) *
-            Math.pow(Math.sin((Radian(lon2) - Radian(lon1)) / 2), 2)
-      )
-    )
-  )
+export const GetRestaurantById = async id => {
+  return await Restaurant.findOne({ _id: id }).populate("owner").exec()
 }
-const Radian = degrees => (degrees * Math.PI) / 180

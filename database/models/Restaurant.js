@@ -33,6 +33,13 @@ const restaurantSchema = new mongoose.Schema(
   }
 )
 
+restaurantSchema.virtual("owner", {
+  justOne: true,
+  foreignField: "_id",
+  localField: "owner_id",
+  ref: "User",
+})
+
 restaurantSchema.index({ location: "2dsphere" })
 
 restaurantSchema.pre("save", function (next) {
@@ -41,6 +48,8 @@ restaurantSchema.pre("save", function (next) {
   }
   next()
 })
+
+restaurantSchema.set("toObject", { virtuals: true })
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema)
 
