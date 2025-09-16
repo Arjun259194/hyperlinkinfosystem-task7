@@ -20,7 +20,7 @@ export function globalErrorHandler(err, req, res, _next) {
     code,
     message: msg,
     success: false,
-    ...(obj),
+    ...obj,
   })
 }
 

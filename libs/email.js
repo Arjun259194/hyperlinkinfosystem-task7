@@ -25,7 +25,7 @@ export default class SMTPGmailService {
     config = {
       user: env.EMAIL_ADDRESS,
       pass: env.EMAIL_TOKEN,
-    }
+    },
   ) {
     if (!SMTPGmailService.instance) {
       SMTPGmailService.instance = new SMTPGmailService(config)

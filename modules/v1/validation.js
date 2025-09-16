@@ -36,4 +36,3 @@ export const restaurantSchema = z.object({
   opening_time: z.string().optional(),
   closing_time: z.string().optional(),
 })
-

@@ -16,19 +16,9 @@ const categories = [
   { name: "Snacks" },
 ]
 
-const ingredients = [
-  { name: "Salt" },
-  { name: "Sugar" },
-  { name: "Butter" },
-  { name: "Flour" },
-]
+const ingredients = [{ name: "Salt" }, { name: "Sugar" }, { name: "Butter" }, { name: "Flour" }]
 
-const fruits = [
-  { name: "Apple" },
-  { name: "Banana" },
-  { name: "Orange" },
-  { name: "Mango" },
-]
+const fruits = [{ name: "Apple" }, { name: "Banana" }, { name: "Orange" }, { name: "Mango" }]
 
 async function seedDB() {
   try {

@@ -21,21 +21,17 @@ const reviewSchema = new mongoose.Schema(
   },
 )
 
-reviewSchema.post(
-  "save",
-  { document: true, query: false },
-  async doc => {
-    await Restaurant.findOneAndUpdate(
-      { _id: doc.restaurant_id },
-      {
-        $inc: {
-          review_count: 1,
-          sum_of_ratings: doc.rating || 0,
-        },
+reviewSchema.post("save", { document: true, query: false }, async doc => {
+  await Restaurant.findOneAndUpdate(
+    { _id: doc.restaurant_id },
+    {
+      $inc: {
+        review_count: 1,
+        sum_of_ratings: doc.rating || 0,
       },
-    ).exec()
-  },
-)
+    },
+  ).exec()
+})
 
 reviewSchema.post("findOneAndDelete", async doc => {
   if (doc) {

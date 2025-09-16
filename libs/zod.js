@@ -8,13 +8,8 @@ import z from "zod"
  * @param {import('zod').ZodSchema<T>} schema - The Zod schema to validate against.
  * @param {unknown} data - The data to validate.
  */
-export default function Validate(
-  schema,
-  data,
-  emessage = "Not valid data"
-) {
+export default function Validate(schema, data, emessage = "Not valid data") {
   const parsedData = schema.safeParse(data)
-  if (!parsedData.success)
-    throw new ErrorResponse(emessage, 400, parsedData.error.issues[0])
+  if (!parsedData.success) throw new ErrorResponse(emessage, 400, parsedData.error.issues[0])
   return parsedData.data
 }

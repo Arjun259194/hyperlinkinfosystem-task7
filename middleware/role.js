@@ -13,9 +13,7 @@ export default function AllowRole(role) {
   const isValidRole = z.enum(["Reporter", "Visitor"]).safeParse(role)
   if (!isValidRole.success) {
     console.log("Wrong role passed in AllowRole middleware.")
-    console.log(
-      `Role ${role} is not allowed in this application for user`,
-    )
+    console.log(`Role ${role} is not allowed in this application for user`)
     process.exit(1)
   }
 
@@ -37,11 +35,7 @@ export default function AllowRole(role) {
       role,
     })
 
-    if (!isMatchUserRole)
-      throw new ErrorResponse(
-        "You don't have access to this route",
-        403,
-      )
+    if (!isMatchUserRole) throw new ErrorResponse("You don't have access to this route", 403)
 
     next()
   }

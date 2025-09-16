@@ -107,7 +107,7 @@ export default class AuthController {
         otp: z.string().min(6).max(6),
         newPassword: z.string(),
       }),
-      req.body
+      req.body,
     )
 
     const user = await FindUserByEmail(data.email)

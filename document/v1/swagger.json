@@ -21,14 +21,19 @@
             "schema": {
               "type": "object",
               "properties": {
-                "username": {
-                  "type": "string"
+                "email": {
+                  "type": "string",
+                  "format": "email"
                 },
                 "password": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 6
+                },
+                "device": {
+                  "$ref": "#/definitions/Device"
                 }
               },
-              "required": ["username", "password"]
+              "required": ["email", "password"]
             }
           }
         ],
@@ -50,29 +55,45 @@
         }
       }
     },
-    "/auth/register": {
+    "/auth/signup": {
       "post": {
         "summary": "User Registration",
-        "description": "Register a new user.",
+        "description": "Register a new user based on role (User/Chef/Delivery_Guy)",
         "parameters": [
           {
             "in": "body",
             "name": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "username": {
-                  "type": "string"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "role": { "type": "string", "enum": ["User"] },
+                    "user": { "$ref": "#/definitions/UserBase" },
+                    "address": { "$ref": "#/definitions/Address" }
+                  },
+                  "required": ["role", "user", "address"]
                 },
-                "password": {
-                  "type": "string"
+                {
+                  "type": "object",
+                  "properties": {
+                    "role": { "type": "string", "enum": ["Chef"] },
+                    "user": { "$ref": "#/definitions/UserBase" },
+                    "restaurant": { "$ref": "#/definitions/Restaurant" },
+                    "restaurant_address": { "$ref": "#/definitions/Address" }
+                  },
+                  "required": ["role", "user", "restaurant", "restaurant_address"]
                 },
-                "email": {
-                  "type": "string"
+                {
+                  "type": "object",
+                  "properties": {
+                    "role": { "type": "string", "enum": ["Delivery_Guy"] },
+                    "user": { "$ref": "#/definitions/UserBase" }
+                  },
+                  "required": ["role", "user"]
                 }
-              },
-              "required": ["username", "password", "email"]
+              ]
             }
           }
         ],
@@ -81,11 +102,149 @@
             "description": "User registered successfully"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request - validation error"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "User Logout",
+        "description": "Logout a logged in user",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "Bearer token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully logged out"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Forgot Password",
+        "description": "Request password reset",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              },
+              "required": ["email"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reset instructions sent"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/auth/verify": {
+      "post": {
+        "summary": "Verify OTP",
+        "description": "Verify OTP code",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string"
+                }
+              },
+              "required": ["otp"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP verified successfully"
+          },
+          "400": {
+            "description": "Invalid OTP"
           }
         }
       }
     }
   },
-  "definitions": {}
+  "definitions": {
+    "UserBase": {
+      "type": "object",
+      "properties": {
+        "full_name": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "enum": ["User", "Chef", "Delivery_Guy"] },
+        "email": { "type": "string", "format": "email" },
+        "password": { "type": "string", "minLength": 6 },
+        "profile_image": { "type": "string", "format": "uri", "nullable": true },
+        "phone": { "type": "string", "minLength": 1 }
+      },
+      "required": ["full_name", "role", "email", "password", "phone"]
+    },
+    "Address": {
+      "type": "object",
+      "properties": {
+        "address": { "type": "string", "nullable": true },
+        "street": { "type": "string", "nullable": true },
+        "state": { "type": "string", "nullable": true },
+        "pin_code": { "type": "string", "nullable": true },
+        "appartment": { "type": "string", "nullable": true },
+        "label": { "type": "string", "enum": ["Home", "Work", "Other"], "default": "Home" },
+        "latitude": { "type": "number", "nullable": true },
+        "longitude": { "type": "number", "nullable": true }
+      }
+    },
+    "Restaurant": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "phone": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "format": "email" },
+        "cover_image": { "type": "string", "format": "uri", "nullable": true },
+        "logo": { "type": "string", "format": "uri", "nullable": true },
+        "delivery_time": { "type": "integer", "minimum": 1 },
+        "delivery_fees": { "type": "number", "minimum": 0 },
+        "is_open": { "type": "boolean", "default": true },
+        "opening_time": { "type": "string" },
+        "closing_time": { "type": "string" }
+      },
+      "required": ["name", "phone", "email"]
+    },
+    "Device": {
+      "type": "object",
+      "properties": {
+        "device_type": { "type": "string" },
+        "device_name": { "type": "string" },
+        "os_version": { "type": "string" },
+        "model_name": { "type": "string" },
+        "ip": { "type": "string" },
+        "app_version": { "type": "string" },
+        "platform": { "type": "string" }
+      }
+    }
+  }
 }

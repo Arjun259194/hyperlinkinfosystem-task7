@@ -13,33 +13,25 @@ import Device from "../database/models/Device.js"
  */
 export default async function verifyToken(req, _, next) {
   const header = req.headers["authorization"] || ""
-  const rawval =
-    header.startsWith("Bearer") ? header.split(" ")[1] : null
+  const rawval = header.startsWith("Bearer") ? header.split(" ")[1] : null
 
-  if (!rawval)
-    throw new ErrorResponse("Not authorized for this route", 401)
+  if (!rawval) throw new ErrorResponse("Not authorized for this route", 401)
 
   const parsedcookieval = await z.jwt().safeParseAsync(rawval)
 
-  if (!parsedcookieval.success)
-    throw new ErrorResponse("not valid token", 401)
+  if (!parsedcookieval.success) throw new ErrorResponse("not valid token", 401)
 
   const token = parsedcookieval.data
 
   const payload = await JwtToken.payloadFromToken(token)
 
-  if (!payload)
-    throw new ErrorResponse(
-      "Invalid token: unable to decode or verify",
-      401,
-    )
+  if (!payload) throw new ErrorResponse("Invalid token: unable to decode or verify", 401)
 
   const device = await Device.findOne({
     user_id: payload.id,
     token,
   }).exec()
-  if (!device)
-    throw new ErrorResponse("Unauthorized device or token", 401)
+  if (!device) throw new ErrorResponse("Unauthorized device or token", 401)
 
   req.userId = payload.id
   req.userEmail = payload.email
