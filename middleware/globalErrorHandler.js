@@ -8,9 +8,7 @@
  * @param {import("express").NextFunction} next - Express next middleware function
  */
 export function globalErrorHandler(err, req, res, _next) {
-  console.log(req)
-  console.log(req.url)
-  console.error("Global error handler caught:", err)
+  console.error("Global error handler caught:", err.message)
 
   const code = err?.code || 500
   const msg = err?.message || "Internal Server Error"

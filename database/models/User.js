@@ -19,8 +19,18 @@ const userSchema = new Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
+  }
 )
+
+userSchema.virtual("address", {
+  ref: "Address",
+  localField: "default_address_id",
+  foreignField: "_id",
+  justOne: true,
+})
+
+userSchema.set("toObject", { virtuals: true })
+userSchema.set("toJSON", { virtuals: true })
 
 userSchema.index({ email: "text" })
 

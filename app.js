@@ -8,6 +8,8 @@ import { env } from "./env.js"
 import connectDB from "./database/index.js"
 import swaggerUi from "swagger-ui-express"
 import fs from "fs"
+import verifyToken from "./middleware/jwt.js"
+import restaurantRouter from "./modules/v1/restaurant/route/restaurantRoute.js"
 
 const IS_DEV_ENV = process.env.NODE_ENV !== "production"
 
@@ -17,6 +19,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.text({ type: "text/*" }))
+app.use(express.urlencoded({ extended: true }))
 
 const v1 = express.Router()
 
@@ -29,6 +32,7 @@ v1.use((_, res, next) => {
 })
 
 v1.use("/auth", decryptRequest, authRouter)
+v1.use("/restaurant", decryptRequest, verifyToken, restaurantRouter)
 
 app.use("/api/v1", v1)
 

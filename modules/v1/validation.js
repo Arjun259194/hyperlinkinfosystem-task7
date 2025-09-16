@@ -1,4 +1,5 @@
 import { z } from "zod"
+import Validate from "../../libs/zod.js"
 
 // Common user schema fields
 export const userBaseSchema = z.object({
@@ -16,6 +17,7 @@ export const addressSchema = z.object({
   street: z.string().optional().nullable(),
   state: z.string().optional().nullable(),
   pin_code: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
   appartment: z.string().optional().nullable(),
   label: z.enum(["Home", "Work", "Other"]).optional().default("Home"),
   latitude: z.number().optional().nullable(),
@@ -36,3 +38,13 @@ export const restaurantSchema = z.object({
   opening_time: z.string().optional(),
   closing_time: z.string().optional(),
 })
+
+export const PaginationValidation = obj => {
+  return Validate(
+    z.object({
+      page: z.coerce.number().int().min(1).default(1).catch(1),
+      limit: z.coerce.number().int().min(1).default(5).catch(5),
+    }),
+    obj
+  )
+}

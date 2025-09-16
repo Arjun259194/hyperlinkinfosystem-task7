@@ -3,7 +3,6 @@ import mongoose from "mongoose"
 const restaurantSchema = new mongoose.Schema(
   {
     owner_id: { type: mongoose.Types.ObjectId, ref: "User" },
-    address_id: { type: mongoose.Types.ObjectId, ref: "Address" },
     name: String,
     description: String,
     phone: String,
@@ -15,13 +14,33 @@ const restaurantSchema = new mongoose.Schema(
     is_open: { type: Boolean, default: true },
     opening_time: String,
     closing_time: String,
+    address: String,
+    street: String,
+    state: String,
+    city: String,
+    pin_code: String,
+    latitude: Number,
+    longitude: Number,
+    location: {
+      type: { type: String, enum: ["Point"], default: "Point" },
+      coordinates: { type: [Number], default: [0, 0] },
+    },
     review_count: { type: Number, default: 0 },
     sum_of_ratings: { type: Number, default: 0 },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
+  }
 )
+
+restaurantSchema.index({ location: "2dsphere" })
+
+restaurantSchema.pre("save", function (next) {
+  if (this.latitude != null && this.longitude != null) {
+    this.location.coordinates = [this.longitude, this.latitude]
+  }
+  next()
+})
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema)
 
