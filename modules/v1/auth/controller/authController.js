@@ -1,16 +1,25 @@
+import z from "zod"
 import Device from "../../../../database/models/Device.js"
 import PasswordHashing from "../../../../libs/hash.js"
 import { JwtToken } from "../../../../libs/jwt.js"
 import Validate from "../../../../libs/zod.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
-import { FindUserByEmail, NewChefAndRestaurant, NewUser } from "../model/authModel.js"
+import {
+  FindAndDeleteDeviceByUserId,
+  FindUserByEmail,
+  NewChefAndRestaurant,
+  NewUser,
+} from "../model/authModel.js"
 import { loginSchema, signupSchema } from "../validation.js"
+import SMTPGmailService, { EmailTemplate } from "../../../../libs/email.js"
+import { env } from "../../../../env.js"
 
 /** @typedef {(req: import("express").Request, res: import("express").Response) => Promise<void>} ExpressFn */
 
 export default class AuthController {
   /** @type {ExpressFn} */
   static async signup(req, res) {
+    console.log(req.body)
     const data = Validate(signupSchema, req.body)
     if (data.role === "User") {
       const { user, address } = data
@@ -24,7 +33,7 @@ export default class AuthController {
       throw new ErrorResponse("Other user role not available now", 400)
     }
 
-    res.locals.sendEncryptedJson({
+    res.status(200).locals.sendEncryptedJson({
       code: 201,
       message: "User Created",
     })
@@ -47,10 +56,78 @@ export default class AuthController {
 
     await device.save()
 
-    res.locals.sendEncryptedJson({
+    res.status(200).locals.sendEncryptedJson({
       code: 200,
       message: "logged in",
       token,
     })
   }
+
+  /**@type {ExpressFn} */
+  static async forgotPassword(req, res) {
+    const email = Validate(z.email(), req.body?.email)
+    const user = await FindUserByEmail(email)
+
+    const mailer = SMTPGmailService.getInstance()
+
+    user.otp = generate6DigitCode()
+
+    await user.save()
+
+    await mailer.sendMail({
+      to: user.email,
+      from: env.EMAIL_ADDRESS,
+      subject: "Forgot password",
+      html: EmailTemplate.ForgotPasswordEmail(user.full_name, user.email, user.otp),
+    })
+
+    res.status(200).locals.sendEncryptedJson({
+      code: 200,
+      message: "Email sent",
+    })
+  }
+
+  /**@type {ExpressFn} */
+  static async logout(req, res) {
+    const userId = req.userId
+    if (!userId) throw new ErrorResponse("User id not found", 401)
+    await FindAndDeleteDeviceByUserId(userId)
+
+    res.status(200).locals.sendEncryptedJson({
+      message: "Logged out",
+      code: 200,
+    })
+  }
+
+  /**@type {ExpressFn} */
+  static async otpVerification(req, res) {
+    const data = Validate(
+      z.object({
+        email: z.email(),
+        otp: z.string().min(6).max(6),
+        newPassword: z.string(),
+      }),
+      req.body
+    )
+
+    const user = await FindUserByEmail(data.email)
+
+    if (user.otp !== data.otp) {
+      throw new ErrorResponse("Wrong OTP", 401)
+    }
+
+    user.otp = null
+    user.password = await PasswordHashing.hash(data.newPassword)
+
+    await user.save()
+
+    res.status(200).locals.sendEncryptedJson({
+      code: 200,
+      message: "Password changed",
+    })
+  }
+}
+
+function generate6DigitCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString()
 }

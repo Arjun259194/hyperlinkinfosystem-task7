@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 
 const deviceSchema = new mongoose.Schema(
   {
-    user_id: { type: mongoose.Types.ObjectId, required: true },
+    user_id: { type: mongoose.Types.ObjectId, required: true, unique: true },
     token: { type: String, default: null },
     device_type: String,
     device_name: String,

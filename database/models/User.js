@@ -14,12 +14,12 @@ const userSchema = new Schema(
     phone: { type: String, required: true, unique: true },
     default_address_id: { type: Types.ObjectId, ref: "Address" },
     addresses: { type: [Types.ObjectId], ref: "Address", default: [] },
-    device_id: { type: Types.ObjectId, ref: "Device", default: null},
-    otp: { type: String, default: null, unique: true },
+    device_id: { type: Types.ObjectId, ref: "Device", default: null },
+    otp: { type: String, default: null },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
+  }
 )
 
 userSchema.index({ email: "text" })

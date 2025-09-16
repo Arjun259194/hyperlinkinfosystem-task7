@@ -25,7 +25,7 @@ export default class SMTPGmailService {
     config = {
       user: env.EMAIL_ADDRESS,
       pass: env.EMAIL_TOKEN,
-    },
+    }
   ) {
     if (!SMTPGmailService.instance) {
       SMTPGmailService.instance = new SMTPGmailService(config)
@@ -58,13 +58,13 @@ export const defMailCred = {
 }
 
 export class EmailTemplate {
-  static ForgotPasswordEmail = (username, email, resetLink) => `
+  static ForgotPasswordEmail = (username, email, otp) => `
 <!DOCTYPE html>
 <html lang="en" >
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reset Your Password</title>
+  <title>Password Reset OTP</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -81,6 +81,7 @@ export class EmailTemplate {
       box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
       overflow: hidden;
       padding: 24px;
+      text-align: center;
     }
     h1 {
       color: #003366;
@@ -93,6 +94,18 @@ export class EmailTemplate {
       line-height: 1.5;
       margin: 0 0 24px 0;
     }
+    .otp-code {
+      display: inline-block;
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a73e8;
+      padding: 16px 32px;
+      border: 2px dashed #1a73e8;
+      border-radius: 8px;
+      margin: 24px 0;
+      letter-spacing: 6px;
+      user-select: all;
+    }
     .info {
       background: #e8f0fe;
       border-left: 4px solid #4285f4;
@@ -101,22 +114,7 @@ export class EmailTemplate {
       border-radius: 4px;
       font-size: 15px;
       color: #202124;
-    }
-    .button {
-      display: inline-block;
-      background-color: #1a73e8;
-      color: #ffffff !important;
-      padding: 14px 28px;
-      font-weight: 600;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 16px;
-      box-shadow: 0 4px 15px rgb(26 115 232 / 0.4);
-      transition: background-color 0.3s ease;
-    }
-    .button:hover {
-      background-color: #155ab6;
-      box-shadow: 0 6px 20px rgb(21 90 182 / 0.6);
+      text-align: left;
     }
     footer {
       margin-top: 40px;
@@ -130,21 +128,16 @@ export class EmailTemplate {
   <div class="container">
     <h1>Password Reset Request</h1>
     <p>Hello <strong>${username}</strong>,</p>
-    <p>We received a request to reset the password associated with this email address (<em>${email}</em>).</p>
-    <p>If you made this request, please click the button below to reset your password. This link is valid for the next 30 minutes.</p>
-
-    <a href="${resetLink}" class="button" target="_blank" rel="noopener noreferrer">Reset Password</a>
-
+    <p>We received a request to reset the password for the account associated with this email address (<em>${email}</em>).</p>
+    <p>Please use the following One-Time Password (OTP) to proceed. This code is valid for the next 30 minutes.</p>
+    <div class="otp-code">${otp}</div>
     <p>If you did not request a password reset, please ignore this email or contact support if you have questions.</p>
-
     <div class="info">
       <strong>User info</strong><br />
       Username: ${username}<br />
       Email: ${email}
     </div>
-
     <p>Thanks,<br />The Support Team</p>
-
     <footer>
       &copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.
     </footer>

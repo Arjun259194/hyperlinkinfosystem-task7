@@ -1,17 +1,23 @@
 import Address from "../../../../database/models/Address.js"
+import Device from "../../../../database/models/Device.js"
 import Restaurant from "../../../../database/models/Restaurant.js"
 import User from "../../../../database/models/User.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
 
 export const FindUserByEmail = async email => {
   try {
-    const user = User.findOne({ email }).exec()
+    const user = await User.findOne({ email }).exec()
     if (!user) throw new ErrorResponse("User not find", 404)
     return user
   } catch (error) {
     console.error("Error while finding user in database:", error)
     throw new ErrorResponse(error.message || "Failed to create user", 500)
   }
+}
+
+export const FindAndDeleteDeviceByUserId = async id => {
+  const device = await Device.findOneAndDelete({ user_id: id }).exec()
+  if (!device) throw new ErrorResponse("Device not found", 404)
 }
 
 export const NewUser = async (userData, addressData) => {

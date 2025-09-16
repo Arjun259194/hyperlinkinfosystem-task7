@@ -6,6 +6,8 @@ import Encryption from "./libs/enc.js"
 import { globalErrorHandler } from "./middleware/globalErrorHandler.js"
 import { env } from "./env.js"
 import connectDB from "./database/index.js"
+import swaggerUi from "swagger-ui-express"
+import fs from "fs"
 
 const IS_DEV_ENV = process.env.NODE_ENV !== "production"
 
@@ -32,6 +34,9 @@ app.use("/api/v1", v1)
 
 app.use(globalErrorHandler)
 
+const swaggerDocument = JSON.parse(fs.readFileSync("./document/v1/swagger.json", "utf-8"))
+
+app.use("/api-doc/v1/", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 if (IS_DEV_ENV) {
   app.get("/dec", (req, res) => {
