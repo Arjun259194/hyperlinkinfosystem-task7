@@ -18,7 +18,7 @@ const reviewSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  }
+  },
 )
 
 reviewSchema.post("save", { document: true, query: false }, async doc => {
@@ -29,7 +29,7 @@ reviewSchema.post("save", { document: true, query: false }, async doc => {
         review_count: 1,
         sum_of_ratings: doc.rating || 0,
       },
-    }
+    },
   ).exec()
 })
 
@@ -42,7 +42,7 @@ reviewSchema.post("findOneAndDelete", async doc => {
           review_count: -1,
           sum_of_ratings: -(doc.rating || 0),
         },
-      }
+      },
     )
   }
 })

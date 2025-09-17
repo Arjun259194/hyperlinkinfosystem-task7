@@ -19,7 +19,7 @@ const menuSchema = new mongoose.Schema(
     },
     dishes: [dishSchema],
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
 )
 
 const Menu = mongoose.model("Menu", menuSchema)

@@ -11,7 +11,7 @@ const cartSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  }
+  },
 )
 
 const Cart = mongoose.model("Cart", cartSchema)
@@ -24,7 +24,7 @@ const cartItemSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  }
+  },
 )
 
 export const CartItem = mongoose.model("CartItem", cartItemSchema)

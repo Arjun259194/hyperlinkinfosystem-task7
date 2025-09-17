@@ -72,11 +72,11 @@ async function seedChefAndRestaurants() {
           is_available: faker.datatype.boolean({ probability: 0.7 }),
           ingredients: faker.helpers.arrayElements(
             ingredients.map(i => i.name),
-            { min: 3, max: 6 }
+            { min: 3, max: 6 },
           ),
           fruits: faker.helpers.arrayElements(
             fruits.map(f => f.name),
-            { min: 3, max: 6 }
+            { min: 3, max: 6 },
           ),
         }
       })
@@ -151,7 +151,7 @@ async function seedUserAndReviews(rest_ids) {
         const newr = new Review(r)
         await newr.validate()
         await newr.save()
-      })
+      }),
     )
   }
 }

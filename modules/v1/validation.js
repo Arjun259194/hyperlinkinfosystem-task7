@@ -45,6 +45,6 @@ export const PaginationValidation = obj => {
       page: z.coerce.number().int().min(1).default(1).catch(1),
       limit: z.coerce.number().int().min(1).default(5).catch(5),
     }),
-    obj
+    obj,
   )
 }
