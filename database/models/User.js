@@ -12,22 +12,22 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     profile_image: { type: String },
     phone: { type: String, required: true, unique: true },
-    default_address_id: { type: Types.ObjectId, ref: "Address" },
+    default_address: { type: Types.ObjectId, ref: "Address" },
     addresses: { type: [Types.ObjectId], ref: "Address", default: [] },
     device_id: { type: Types.ObjectId, ref: "Device", default: null },
     otp: { type: String, default: null },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
+  }
 )
 
-userSchema.virtual("address", {
-  ref: "Address",
-  localField: "default_address_id",
-  foreignField: "_id",
-  justOne: true,
-})
+// userSchema.virtual("address", {
+//   ref: "Address",
+//   localField: "default_address",
+//   foreignField: "_id",
+//   justOne: true,
+// })
 
 userSchema.set("toObject", { virtuals: true })
 userSchema.set("toJSON", { virtuals: true })

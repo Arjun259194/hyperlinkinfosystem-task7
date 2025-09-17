@@ -1,10 +1,13 @@
 import { Router } from "express"
 import RestaurantController from "../controller/restaurantController.js"
+import AllowRole from "../../../../middleware/role.js"
 
 const restaurantRouter = Router()
 
-restaurantRouter.get("/", RestaurantController.get)
+restaurantRouter.get("/near", AllowRole("User"), RestaurantController.get)
 restaurantRouter.get("/detailed", RestaurantController.getById)
+restaurantRouter.post("/review", AllowRole("User"), RestaurantController.writeReview)
+restaurantRouter.post("/dish", AllowRole("Chef"), RestaurantController.addDish)
 
 export default restaurantRouter
 

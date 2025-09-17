@@ -6,7 +6,7 @@ import User from "../database/models/User.js"
  *
  * This middleware checks for valid user role
  * If using this middleware, make sure it comes after the token verification middleware in middleware order
- * @param {"Visitor"  | "Reporter"} role
+ * @param {"User" | "Chef"} role
  */
 
 export default function AllowRole(role) {

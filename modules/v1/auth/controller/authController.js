@@ -19,16 +19,16 @@ import { env } from "../../../../env.js"
 export default class AuthController {
   /** @type {ExpressFn} */
   static async signup(req, res) {
-    console.log(req.body)
+    let ret
     const data = Validate(signupSchema, req.body)
     if (data.role === "User") {
       const { user, address } = data
       user.password = await PasswordHashing.hash(user.password)
-      await NewUser(user, address)
+      ret = await NewUser(user, address)
     } else if (data.role == "Chef") {
       let { restaurant, restaurant_address, user } = data
       user.password = await PasswordHashing.hash(user.password)
-      await NewChefAndRestaurant(user, restaurant, restaurant_address)
+      ret = await NewChefAndRestaurant(user, restaurant, restaurant_address)
     } else {
       throw new ErrorResponse("Other user role not available now", 400)
     }
@@ -36,6 +36,7 @@ export default class AuthController {
     res.status(200).locals.sendEncryptedJson({
       code: 201,
       message: "User Created",
+      ret,
     })
   }
 
@@ -52,9 +53,11 @@ export default class AuthController {
 
     const token = await JwtToken.new({ id: user._id })
 
-    const device = new Device({ ...device_data, token, user_id: user._id })
-
-    await device.save()
+    const device = await Device.findOneAndUpdate(
+      { user_id: user._id },
+      { token },
+      { upsert: true, new: true }
+    ).exec()
 
     res.status(200).locals.sendEncryptedJson({
       code: 200,
@@ -107,7 +110,7 @@ export default class AuthController {
         otp: z.string().min(6).max(6),
         newPassword: z.string(),
       }),
-      req.body,
+      req.body
     )
 
     const user = await FindUserByEmail(data.email)

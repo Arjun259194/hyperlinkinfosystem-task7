@@ -34,6 +34,13 @@ export const restaurantSchema = z.object({
   logo: z.string().url().optional().nullable(),
   delivery_time: z.number().int().positive().optional(),
   delivery_fees: z.number().nonnegative().optional(),
+  address: z.string().optional().nullable(),
+  street: z.string().optional().nullable(),
+  state: z.string().optional().nullable(),
+  pin_code: z.string().optional().nullable(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  city: z.string().optional().nullable(),
   is_open: z.boolean().optional().default(true),
   opening_time: z.string().optional(),
   closing_time: z.string().optional(),
@@ -45,6 +52,6 @@ export const PaginationValidation = obj => {
       page: z.coerce.number().int().min(1).default(1).catch(1),
       limit: z.coerce.number().int().min(1).default(5).catch(5),
     }),
-    obj,
+    obj
   )
 }

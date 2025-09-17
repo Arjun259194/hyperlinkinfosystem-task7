@@ -12,7 +12,6 @@ export const signupSchema = z.discriminatedUnion("role", [
     role: z.literal("Chef"),
     user: userBaseSchema.extend({ role: z.literal("Chef") }),
     restaurant: restaurantSchema,
-    restaurant_address: addressSchema,
   }),
 
   z.object({

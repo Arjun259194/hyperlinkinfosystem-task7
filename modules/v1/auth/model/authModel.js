@@ -23,7 +23,7 @@ export const NewUser = async (userData, addressData) => {
     const user = new User({
       ...userData,
       role: "User",
-      default_address_id: address._id,
+      default_address: address._id,
       addresses: [address._id],
     })
 
@@ -53,7 +53,7 @@ export const NewChefAndRestaurant = async (chef_data, restaurant_data, address_d
 
     const restaurant = new Restaurant(restaurant_data)
 
-    restaurant.owner_id = user._id
+    restaurant.owner = user._id
     restaurant.address_id = address._id
 
     await restaurant.validate()

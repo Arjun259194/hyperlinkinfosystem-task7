@@ -16,10 +16,11 @@ const menuSchema = new mongoose.Schema(
     restaurant: {
       type: mongoose.Types.ObjectId,
       ref: "Restaurant",
+      unique: true,
     },
     dishes: [dishSchema],
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 )
 
 const Menu = mongoose.model("Menu", menuSchema)

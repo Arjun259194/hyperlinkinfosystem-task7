@@ -2,7 +2,14 @@ import z from "zod"
 import Validate from "../../../../libs/zod.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
 import { PaginationValidation } from "../../validation.js"
-import { GetRestaurantById, GetRestaurantsAsPerUser } from "../model/restaurantModel.js"
+import {
+  CreateDish,
+  GetRestaurantById,
+  GetRestaurantByOwnerId,
+  GetRestaurantsAsPerUser,
+  WriteReview,
+} from "../model/restaurantModel.js"
+import { dishSchema, reviewSCheam } from "../validation.js"
 
 /** @typedef {(req: import("express").Request, res: import("express").Response) => Promise<void>} ExpressFn */
 export default class RestaurantController {
@@ -29,6 +36,35 @@ export default class RestaurantController {
       code: 200,
       message: "restaurant found",
       data: restaurant,
+    })
+  }
+
+  /**@type {ExpressFn} */
+  static async writeReview(req, res) {
+    if (!req.userId) throw new ErrorResponse("User Id not found", 401)
+    const data = Validate(reviewSCheam, req.body)
+    const review = await WriteReview(req.userId, data.restaurant_id, data.content, data.rating)
+    res.status(201).locals.sendEncryptedJson({
+      code: 201,
+      message: "review written",
+      review,
+    })
+  }
+
+  /**@type {ExpressFn} */
+  static async addDish(req, res) {
+    if (!req.userId) throw new ErrorResponse("User Id not found", 401)
+    const addon = Validate(dishSchema, req.body)
+
+    const restaurant = await GetRestaurantByOwnerId(req.userId)
+    if (!restaurant) throw new ErrorResponse("No restaurant found", 404)
+
+    const dish = await CreateDish(restaurant._id, addon)
+
+    res.status(201).locals.sendEncryptedJson({
+      code: 201,
+      message: "Dish added",
+      dish,
     })
   }
 }

@@ -10,8 +10,11 @@ import swaggerUi from "swagger-ui-express"
 import fs from "fs"
 import verifyToken from "./middleware/jwt.js"
 import restaurantRouter from "./modules/v1/restaurant/route/restaurantRoute.js"
+import addressRouter from "./modules/v1/address/route/addressRoute.js"
 
 const IS_DEV_ENV = process.env.NODE_ENV !== "production"
+
+console.clear() // for better look at the server logs
 
 await connectDB(env.DATABASE_URI)
 
@@ -33,6 +36,7 @@ v1.use((_, res, next) => {
 
 v1.use("/auth", decryptRequest, authRouter)
 v1.use("/restaurant", decryptRequest, verifyToken, restaurantRouter)
+v1.use("/address", decryptRequest, verifyToken, addressRouter)
 
 app.use("/api/v1", v1)
 
@@ -56,4 +60,14 @@ if (IS_DEV_ENV) {
   })
 }
 
-app.listen(env.PORT, () => console.log(`Server running on port: ${env.PORT}`))
+app.listen(env.PORT, () => {
+  console.log(
+    "\x1b[36m%s\x1b[0m",
+    `
+    🚀 ===========================================
+       Server is blasting off on port: ${env.PORT}
+       Ready to handle requests! 🎯
+       ===========================================
+#Logs`
+  )
+})

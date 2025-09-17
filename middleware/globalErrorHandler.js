@@ -11,7 +11,6 @@ export function globalErrorHandler(err, req, res, _next) {
   console.error("Global error handler caught:", err.message, err.code)
 
   const code = err.code
-  console.info("🚀 ~ globalErrorHandler ~ code:", code)
   const msg = err?.message || "Internal Server Error"
   const obj = err?.obj || {}
 
