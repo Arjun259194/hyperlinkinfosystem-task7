@@ -2,7 +2,7 @@ import z from "zod"
 import Validate from "../../../../libs/zod.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
 import { PaginationValidation } from "../../validation.js"
-import { GetRestaurantsAsPerUser } from "../model/restaurantModel.js"
+import { GetRestaurantById, GetRestaurantsAsPerUser } from "../model/restaurantModel.js"
 
 /** @typedef {(req: import("express").Request, res: import("express").Response) => Promise<void>} ExpressFn */
 export default class RestaurantController {
@@ -24,5 +24,11 @@ export default class RestaurantController {
   /** @type {ExpressFn} */
   static async getById(req, res) {
     const restaurant_id = Validate(z.string(), req.body?.restaurant_id)
+    const restaurant = await GetRestaurantById(restaurant_id)
+    res.status(200).locals.sendEncryptedJson({
+      code: 200,
+      message: "restaurant found",
+      data: restaurant,
+    })
   }
 }

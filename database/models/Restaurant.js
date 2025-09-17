@@ -1,8 +1,10 @@
 import mongoose from "mongoose"
+import "../models/Review.js"
+import "../models/Menu.js"
 
 const restaurantSchema = new mongoose.Schema(
   {
-    owner_id: { type: mongoose.Types.ObjectId, ref: "User" },
+    owner: { type: mongoose.Types.ObjectId, ref: "User" },
     name: String,
     description: String,
     phone: String,
@@ -33,11 +35,18 @@ const restaurantSchema = new mongoose.Schema(
   }
 )
 
-restaurantSchema.virtual("owner", {
+restaurantSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "restaurant",
+  justOne: false,
+})
+
+restaurantSchema.virtual("menu", {
+  ref: "Menu",
+  localField: "_id",
+  foreignField: "restaurant",
   justOne: true,
-  foreignField: "_id",
-  localField: "owner_id",
-  ref: "User",
 })
 
 restaurantSchema.index({ location: "2dsphere" })

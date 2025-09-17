@@ -9,6 +9,111 @@
   "basePath": "/api/v1",
   "schemes": ["http"],
   "paths": {
+    "/lookup/fruits": {
+      "get": {
+        "summary": "Get Fruits",
+        "description": "Get list of all fruits",
+        "responses": {
+          "200": {
+            "description": "List of fruits",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": { "type": "integer", "example": 200 },
+                "message": { "type": "string", "example": "found" },
+                "data": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/lookup/categories": {
+      "get": {
+        "summary": "Get Categories",
+        "description": "Get list of all categories",
+        "responses": {
+          "200": {
+            "description": "List of categories",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": { "type": "integer", "example": 200 },
+                "message": { "type": "string", "example": "found" },
+                "data": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/lookup/ingredients": {
+      "get": {
+        "summary": "Get Ingredients",
+        "description": "Get list of all ingredients",
+        "responses": {
+          "200": {
+            "description": "List of ingredients",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": { "type": "integer", "example": 200 },
+                "message": { "type": "string", "example": "found" },
+                "data": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/restaurant": {
+      "get": {
+        "summary": "Get Restaurants",
+        "description": "Get paginated list of restaurants for the user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer",
+            "minimum": 1,
+            "default": 5,
+            "description": "Items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of restaurants",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": { "type": "integer", "example": 200 },
+                "message": { "type": "string", "example": "restaurants found" },
+                "data": {
+                  "type": "array",
+                  "items": { "$ref": "#/definitions/Restaurant" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized - User ID not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
     "/auth/login": {
       "post": {
         "summary": "User Login",
@@ -192,6 +297,21 @@
     }
   },
   "definitions": {
+    "PaginationParams": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 5
+        }
+      }
+    },
     "UserBase": {
       "type": "object",
       "properties": {

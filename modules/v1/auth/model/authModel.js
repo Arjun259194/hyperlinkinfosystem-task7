@@ -5,14 +5,9 @@ import User from "../../../../database/models/User.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
 
 export const FindUserByEmail = async email => {
-  try {
-    const user = await User.findOne({ email }).exec()
-    if (!user) throw new ErrorResponse("User not find", 404)
-    return user
-  } catch (error) {
-    console.error("Error while finding user in database:", error)
-    throw new ErrorResponse(error.message || "Failed to create user", 500)
-  }
+  const user = await User.findOne({ email }).exec()
+  if (!user) throw new ErrorResponse("User not find", 404)
+  return user
 }
 
 export const FindAndDeleteDeviceByUserId = async id => {

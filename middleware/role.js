@@ -10,7 +10,7 @@ import User from "../database/models/User.js"
  */
 
 export default function AllowRole(role) {
-  const isValidRole = z.enum(["Reporter", "Visitor"]).safeParse(role)
+  const isValidRole = z.enum(["User", "Chef"]).safeParse(role)
   if (!isValidRole.success) {
     console.log("Wrong role passed in AllowRole middleware.")
     console.log(`Role ${role} is not allowed in this application for user`)

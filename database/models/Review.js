@@ -3,12 +3,12 @@ import Restaurant from "./Restaurant.js"
 
 const reviewSchema = new mongoose.Schema(
   {
-    restaurant_id: {
+    restaurant: {
       type: mongoose.Types.ObjectId,
       required: true,
       ref: "Restaurant",
     },
-    reviewer_id: {
+    reviewer: {
       type: mongoose.Types.ObjectId,
       required: true,
       ref: "User",
@@ -18,31 +18,31 @@ const reviewSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
+  }
 )
 
 reviewSchema.post("save", { document: true, query: false }, async doc => {
   await Restaurant.findOneAndUpdate(
-    { _id: doc.restaurant_id },
+    { _id: doc.restaurant },
     {
       $inc: {
         review_count: 1,
         sum_of_ratings: doc.rating || 0,
       },
-    },
+    }
   ).exec()
 })
 
 reviewSchema.post("findOneAndDelete", async doc => {
   if (doc) {
     Restaurant.findOneAndUpdate(
-      { _id: doc.restaurant_id },
+      { _id: doc.restaurant },
       {
         $inc: {
           review_count: -1,
           sum_of_ratings: -(doc.rating || 0),
         },
-      },
+      }
     )
   }
 })

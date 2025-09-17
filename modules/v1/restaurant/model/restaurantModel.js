@@ -2,23 +2,6 @@ import Restaurant from "../../../../database/models/Restaurant.js"
 import User from "../../../../database/models/User.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
 
-/*
-address: {
-    _id: new ObjectId('68c8f94cb3c081522cbea62d'),
-    address: '123 Maple Street',
-    street: 'Maple Street',
-    state: 'California',
-    pin_code: '90210',
-    appartment: 'Apt 4B',
-    label: 'Home',
-    latitude: 23.04132,
-    longitude: 72.528036,
-    created_at: 2025-09-16T05:44:44.906Z,
-    updated_at: 2025-09-16T05:44:44.906Z,
-    __v: 0
-  },
-  */
-
 export const GetRestaurantsAsPerUser = async (userId, page, limit) => {
   try {
     const user = await User.findOne({ _id: userId }).populate("address").exec() // includes address
@@ -51,5 +34,14 @@ export const GetRestaurantsAsPerUser = async (userId, page, limit) => {
 }
 
 export const GetRestaurantById = async id => {
-  return await Restaurant.findOne({ _id: id }).populate("owner").exec()
+  const restaurant = await Restaurant.findOne({ _id: id })
+    .populate("reviews")
+    .populate("menu")
+    .populate({
+      path: "owner",
+      select: "-password -otp",
+    })
+    .exec()
+  if (!restaurant) throw new ErrorResponse("Restaurant not found", 404)
+  return restaurant.toObject()
 }
