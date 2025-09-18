@@ -9,7 +9,7 @@ export default async function connectDB(uri) {
     🚀 ==========================================
        Database Connection Established! 
        MongoDB is ready to rock! 🎉
-       ==========================================`
+       ==========================================`,
     )
   } catch (error) {
     console.log(
@@ -18,7 +18,7 @@ export default async function connectDB(uri) {
     ❌ ==========================================
        Database Connection Failed!
        Error: ${error}
-       ==========================================`
+       ==========================================`,
     )
     process.exit(1)
   }

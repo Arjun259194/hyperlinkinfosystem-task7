@@ -68,6 +68,6 @@ app.listen(env.PORT, () => {
        Server is blasting off on port: ${env.PORT}
        Ready to handle requests! 🎯
        ===========================================
-#Logs`
+#Logs`,
   )
 })

@@ -13,12 +13,12 @@ export const newAddress = async (userId, data, make_default = false) => {
       $push: {
         addresses: address._id,
       },
-      ...(make_default
-        ? {
-            default_address: address._id,
-          }
-        : {}),
-    }
+      ...(make_default ?
+        {
+          default_address: address._id,
+        }
+      : {}),
+    },
   ).exec()
 
   return address.toObject()

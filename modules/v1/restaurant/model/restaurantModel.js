@@ -80,7 +80,7 @@ export const WriteReview = async (userId, rest_id, content, rating) => {
 
 export const CreateDish = async (
   rest_id,
-  { name, price, image, is_veg, is_available, ingredients, fruits, category }
+  { name, price, image, is_veg, is_available, ingredients, fruits, category },
 ) =>
   await Menu.findOneAndUpdate(
     {
@@ -100,5 +100,5 @@ export const CreateDish = async (
         },
       },
     },
-    { new: true, upsert: true }
+    { new: true, upsert: true },
   )
