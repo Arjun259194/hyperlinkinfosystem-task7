@@ -25,15 +25,42 @@ export const newAddress = async (userId, data, make_default = false) => {
 }
 
 export const updateAddress = async (address_id, update) => {
-  return await Address.findOneAndUpdate({ _id: address_id }, { update }).exec()
+  return await Address.findOneAndUpdate({ _id: address_id }, { ...update }).exec()
 }
 
-export const deleteAddress = async address_id => {
+export const deleteAddress = async (userId, address_id) => {
+  const user = await User.findOne({ _id: userId }).exec()
+  if (!user) throw new ErrorResponse("User not found", 404)
+
+  const isAuthorized = user.addresses.some(add => {
+    return add.toString() === address_id
+  })
+
+  if (!isAuthorized) {
+    throw new ErrorResponse("Not your address to delete", 401)
+  }
+
   return await Address.findByIdAndDelete(address_id).exec()
 }
 
 export const changeDefaultAddress = async (userId, address_id) => {
-  return await User.findOneAndUpdate({ _id: userId }, { default_address: address_id }).exec()
+  const exists = await Address.exists({ _id: address_id }).exec()
+  if (!exists) {
+    throw new ErrorResponse("Not actual address", 404)
+  }
+
+  const user = await User.findOne({ _id: userId }).exec()
+  if (!user) throw new ErrorResponse("User not founda", 404)
+
+  if (!user.addresses.some(a => a.toString() === address_id)) {
+    user.addresses.push(address_id)
+  }
+
+  user.default_address = address_id
+
+  await user.save()
+
+  return
 }
 
 export const getUserAddresses = async userId => {

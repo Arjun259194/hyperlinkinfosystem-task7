@@ -12,3 +12,13 @@ export const addressSchema = z.object({
   longitude: z.number().optional(),
   make_default: z.boolean().optional(),
 })
+
+export const addressUpdateSChmea = addressSchema
+  .omit({ make_default: true, label: true })
+  .extend({
+    label: z.enum(["Home", "Work", "Other"]),
+  })
+  .partial()
+  .extend({
+    address_id: z.string(),
+  })
