@@ -25,7 +25,7 @@ export default class CartController {
       z.object({
         dish_id: z.string(),
       }),
-      req.body
+      req.body,
     )
     const item = await AddToCart(req.userId, dish_id)
     res.status(200).locals.sendEncryptedJson({
@@ -43,7 +43,7 @@ export default class CartController {
         id: z.string(),
         quntitry: z.coerce.number().int(),
       }),
-      req.body
+      req.body,
     )
     const updatedCart = await UpdateQuantity(req.userId, cartItemUpdate.id, cartItemUpdate.quntitry)
 

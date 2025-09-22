@@ -120,7 +120,7 @@ export const WriteReview = async (userId, rest_id, content, rating) => {
 
 export const CreateDish = async (
   rest_id,
-  { name, price, image, is_veg, is_available, ingredients, fruits, category }
+  { name, price, image, is_veg, is_available, ingredients, fruits, category },
 ) => {
   const dish = new Dish({
     name,
@@ -144,7 +144,7 @@ export const CreateDish = async (
         dishes: dish._id,
       },
     },
-    { new: true, upsert: true }
+    { new: true, upsert: true },
   )
     .populate("dishes")
     .exec()

@@ -59,7 +59,7 @@ export default class AuthController {
     const device = await Device.findOneAndUpdate(
       { user_id: user._id },
       { token },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     ).exec()
 
     res.status(200).locals.sendEncryptedJson({
@@ -113,7 +113,7 @@ export default class AuthController {
         otp: z.string().min(6).max(6),
         newPassword: z.string(),
       }),
-      req.body
+      req.body,
     )
 
     const user = await FindUserByEmail(data.email)

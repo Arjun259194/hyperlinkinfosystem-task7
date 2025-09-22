@@ -22,7 +22,7 @@ const menuSchema = new mongoose.Schema(
     },
     dishes: [{ type: mongoose.Types.ObjectId, ref: "Dish" }],
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
 )
 
 const Menu = mongoose.model("Menu", menuSchema)

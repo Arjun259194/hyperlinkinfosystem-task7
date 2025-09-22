@@ -23,7 +23,7 @@ export const AddToCart = async (user_id, dish_id) => {
     {
       new: true,
       upsert: true,
-    }
+    },
   ).exec()
 
   return cart.toObject()
@@ -33,7 +33,7 @@ export const UpdateQuantity = async (userId, cartItemId, quantity) => {
   const updatedCart = await Cart.findOneAndUpdate(
     { user: userId, "items._id": cartItemId },
     { $inc: { "items.$.quantity": quantity } },
-    { new: true }
+    { new: true },
   ).exec()
   if (!updatedCart) throw new ErrorResponse("Cart not found", 404)
   return updatedCart.toObject()
@@ -47,6 +47,6 @@ export const RemoveCartItem = async (userId, cartItemId) => {
         items: { dish: cartItemId },
       },
     },
-    { new: true }
+    { new: true },
   ).lean()
 }
