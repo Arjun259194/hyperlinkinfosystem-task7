@@ -4,6 +4,7 @@ import Restaurant from "../../../../database/models/Restaurant.js"
 import Review from "../../../../database/models/Review.js"
 import User from "../../../../database/models/User.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
+import mongoose from "mongoose"
 
 export const GetRestaurantByOwnerId = async userId =>
   await Restaurant.findOne({ owner: userId })
@@ -21,22 +22,16 @@ export const SearchRestaurant = async params => {
   let query = {}
 
   if (params.name) query.name = { $regex: params.name, $options: "i" }
-
   if (params.city) query.city = params.city
-
   if (params.state) query.state = params.state
-
   if (params.is_open !== undefined) query.is_open = params.is_open
-
   if (params.delivery_time !== undefined) query.delivery_time = { $lte: params.delivery_time }
-
   if (params.min_price !== undefined || params.max_price !== undefined) {
     query.delivery_fees = {}
     if (params.min_price !== undefined) query.delivery_fees.$gte = params.min_price
     if (params.max_price !== undefined) query.delivery_fees.$lte = params.max_price
     if (Object.keys(query.delivery_fees).length === 0) delete query.delivery_fees
   }
-
   if (params.min_rating !== undefined) {
     query.$expr = { $gte: [{ $divide: ["$sum_of_ratings", "$review_count"] }, params.min_rating] }
   }
@@ -120,7 +115,7 @@ export const WriteReview = async (userId, rest_id, content, rating) => {
 
 export const CreateDish = async (
   rest_id,
-  { name, price, image, is_veg, is_available, ingredients, fruits, category },
+  { name, price, image, is_veg, is_available, ingredients, fruits, category }
 ) => {
   const dish = new Dish({
     name,
@@ -144,8 +139,31 @@ export const CreateDish = async (
         dishes: dish._id,
       },
     },
-    { new: true, upsert: true },
+    { new: true, upsert: true }
   )
     .populate("dishes")
     .exec()
+}
+
+/**
+ *
+ * @param {string} user_id
+ * @param {string} dish_id
+ * @param {Record<string, unknown>} update
+ * @returns
+ */
+export const updateDish = async (user_id, dish_id, update) => {
+  const restaurant = await Restaurant.findOne({ owner: user_id }).exec()
+  if (!restaurant) throw new ErrorResponse("Restaurant not found under your ownership", 401)
+
+  const menu = await Menu.findOne({ restaurant: restaurant._id }).exec()
+  if (!menu) throw new ErrorResponse("No manu was found!", 404)
+
+  if (!menu.dishes.some(x => x._id.toString() === dish_id)) {
+    throw new ErrorResponse("No dish found in you menu", 404)
+  }
+  const updated = await Dish.findOneAndUpdate({ _id: dish_id }, { ...update }, { new: true }).lean()
+  console.log("🚀 ~ updateDish ~ updated:", updated)
+  if (!updated) throw new ErrorResponse("No dish found", 404)
+  return updated
 }

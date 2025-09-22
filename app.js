@@ -12,6 +12,7 @@ import verifyToken from "./middleware/jwt.js"
 import restaurantRouter from "./modules/v1/restaurant/route/restaurantRoute.js"
 import addressRouter from "./modules/v1/address/route/addressRoute.js"
 import cartRouter from "./modules/v1/cart/route/cartRoute.js"
+import userRouter from "./modules/v1/user/route/userRoute.js"
 
 const IS_DEV_ENV = process.env.NODE_ENV !== "production"
 
@@ -39,6 +40,7 @@ v1.use("/auth", decryptRequest, authRouter)
 v1.use("/restaurant", decryptRequest, verifyToken, restaurantRouter)
 v1.use("/address", decryptRequest, verifyToken, addressRouter)
 v1.use("/cart", decryptRequest, verifyToken, cartRouter)
+v1.use("/user", decryptRequest, verifyToken, userRouter)
 
 app.use("/api/v1", v1)
 
@@ -70,6 +72,6 @@ app.listen(env.PORT, () => {
        Server is blasting off on port: ${env.PORT}
        Ready to handle requests! 🎯
        ===========================================
-#Logs`,
+#Logs`
   )
 })

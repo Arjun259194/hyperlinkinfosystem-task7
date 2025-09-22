@@ -8,9 +8,15 @@ import {
   GetRestaurantByOwnerId,
   GetRestaurantsAsPerUser,
   SearchRestaurant,
+  updateDish,
   WriteReview,
 } from "../model/restaurantModel.js"
-import { dishSchema, restaurantSearchSchema, reviewSCheam } from "../validation.js"
+import {
+  dishSchema,
+  dishUpdateSchema,
+  restaurantSearchSchema,
+  reviewSCheam,
+} from "../validation.js"
 
 /** @typedef {(req: import("express").Request, res: import("express").Response) => Promise<void>} ExpressFn */
 export default class RestaurantController {
@@ -79,6 +85,21 @@ export default class RestaurantController {
       code: 201,
       message: "Dish added",
       dish,
+    })
+  }
+
+  /**@type {ExpressFn} */
+  static async updateDish(req, res) {
+    if (!req.userId) throw new ErrorResponse("User Id not found", 401)
+    const { dish_id, ...update } = Validate(dishUpdateSchema, req.body)
+    console.log("🚀 ~ RestaurantController ~ updateDish ~ dish_id:", dish_id)
+
+    const updated = await updateDish(req.userId, dish_id, update)
+
+    res.status(200).locals.sendEncryptedJson({
+      code: 200,
+      message: "Updated",
+      data: updated,
     })
   }
 }

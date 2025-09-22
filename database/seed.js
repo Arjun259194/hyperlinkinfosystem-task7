@@ -73,11 +73,11 @@ async function seedChefAndRestaurants() {
           is_available: faker.datatype.boolean({ probability: 0.7 }),
           ingredients: faker.helpers.arrayElements(
             ingredients.map(i => i.name),
-            { min: 3, max: 6 },
+            { min: 3, max: 6 }
           ),
           fruits: faker.helpers.arrayElements(
             fruits.map(f => f.name),
-            { min: 3, max: 6 },
+            { min: 3, max: 6 }
           ),
           category: faker.helpers.arrayElement(["Breakfast", "Lunch", "Dinner"]),
         }
@@ -154,7 +154,7 @@ async function seedUserAndReviews(rest_ids) {
         const newr = new Review(r)
         await newr.validate()
         await newr.save()
-      }),
+      })
     )
   }
 }
@@ -188,7 +188,7 @@ async function seedDB() {
         "  - *20 Addresses (restaurants)\n" +
         "  - *180 Reviews (15 * 12)\n" +
         "  - *20 Chefs\n" +
-        "  - Carts",
+        "  - Carts"
     )
 
     await Promise.all([
@@ -206,11 +206,11 @@ async function seedDB() {
         "  ✔ Categories\n" +
         "  ✔ Ingredients\n" +
         "  ✔ Fruits\n" +
-        "  ✔ 20 Restaurants\n" +
-        "  ✔ 160 Menus (8 * 20)\n" +
-        "  ✔ 20 Chefs\n" +
-        "  ✔ 7 Users\n" +
-        "  ✔ 180 Reviews (15 * 12)\n",
+        "  ✔ *20 Restaurants\n" +
+        "  ✔ *160 Menus (8 * 20)\n" +
+        "  ✔ *20 Chefs\n" +
+        "  ✔ *7 Users\n" +
+        "  ✔ *180 Reviews (15 * 12)\n"
     )
 
     console.log("\x1b[36m%s\x1b[0m", "🌱 Seeding complete. Exiting.\n")

@@ -7,13 +7,30 @@
  * @param {import("express").Response} res - Express response
  * @param {import("express").NextFunction} next - Express next middleware function
  */
-export function globalErrorHandler(err, req, res, _next) {
-  console.error("Global error handler caught:", err.message, err.code)
-
+export function globalErrorHandler(err, _, res, _next) {
+  // Extract message and code
   const code = err.code || 500
   const msg = err?.message || "Internal Server Error"
-  const obj = err?.obj || {}
 
+  // Extract where error was thrown from stack trace (first stack line after message)
+  let origin = "Unknown location"
+  if (err.stack) {
+    // stack trace format: Error: message\n at file:line:col ...
+    const stackLines = err.stack.split("\n").slice(1)
+    if (stackLines.length > 0) {
+      // Simplify stack frame info (remove 'at' and extra parts)
+      origin = stackLines[0].trim().replace(/^at\s+/g, "")
+    }
+  }
+
+  // Log concise error info
+  console.error(`\n[Error] Message : ${msg}`)
+  console.error(`[Error] Code    : ${code}`)
+  console.error(`[Error] Location: ${origin}`)
+  console.error(`[Error] Stack Trace:\n${err.stack}\n`)
+
+  // Respond with json error
+  const obj = err?.obj || {}
   res.status(code).json({
     code,
     message: msg,
