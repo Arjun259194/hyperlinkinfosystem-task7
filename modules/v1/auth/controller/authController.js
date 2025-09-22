@@ -21,11 +21,14 @@ export default class AuthController {
   static async signup(req, res) {
     let ret
     const data = Validate(signupSchema, req.body)
+
     if (data.role === "User") {
       const { user, address } = data
       user.password = await PasswordHashing.hash(user.password)
       ret = await NewUser(user, address)
-    } else if (data.role == "Chef") {
+    } else if (data.role === "Chef") {
+      console.log("🚀 ~ AuthController ~ signup ~ data:", data)
+      console.log("🚀 ~ AuthController ~ signup ~ role:", data.role)
       let { restaurant, restaurant_address, user } = data
       user.password = await PasswordHashing.hash(user.password)
       ret = await NewChefAndRestaurant(user, restaurant, restaurant_address)
@@ -56,7 +59,7 @@ export default class AuthController {
     const device = await Device.findOneAndUpdate(
       { user_id: user._id },
       { token },
-      { upsert: true, new: true },
+      { upsert: true, new: true }
     ).exec()
 
     res.status(200).locals.sendEncryptedJson({
@@ -110,7 +113,7 @@ export default class AuthController {
         otp: z.string().min(6).max(6),
         newPassword: z.string(),
       }),
-      req.body,
+      req.body
     )
 
     const user = await FindUserByEmail(data.email)

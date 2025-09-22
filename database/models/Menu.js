@@ -11,6 +11,8 @@ const dishSchema = new mongoose.Schema({
   category: { type: String, enum: ["Breakfast", "Lunch", "Dinner"] },
 })
 
+export const Dish = mongoose.model("Dish", dishSchema)
+
 const menuSchema = new mongoose.Schema(
   {
     restaurant: {
@@ -18,9 +20,9 @@ const menuSchema = new mongoose.Schema(
       ref: "Restaurant",
       unique: true,
     },
-    dishes: [dishSchema],
+    dishes: [{ type: mongoose.Types.ObjectId, ref: "Dish" }],
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 )
 
 const Menu = mongoose.model("Menu", menuSchema)

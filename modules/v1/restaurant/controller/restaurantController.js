@@ -7,9 +7,10 @@ import {
   GetRestaurantById,
   GetRestaurantByOwnerId,
   GetRestaurantsAsPerUser,
+  SearchRestaurant,
   WriteReview,
 } from "../model/restaurantModel.js"
-import { dishSchema, reviewSCheam } from "../validation.js"
+import { dishSchema, restaurantSearchSchema, reviewSCheam } from "../validation.js"
 
 /** @typedef {(req: import("express").Request, res: import("express").Response) => Promise<void>} ExpressFn */
 export default class RestaurantController {
@@ -28,14 +29,27 @@ export default class RestaurantController {
     })
   }
 
+  /**
+   * @type {ExpressFn}
+   */
+  static async search(req, res) {
+    const param = Validate(restaurantSearchSchema, req.query)
+    const restaurants = await SearchRestaurant(param)
+    res.status(200).locals.sendEncryptedJson({
+      code: 200,
+      message: "restaurants found",
+      data: restaurants,
+    })
+  }
+
   /** @type {ExpressFn} */
   static async getById(req, res) {
     const restaurant_id = Validate(z.string(), req.body?.restaurant_id)
-    const restaurant = await GetRestaurantById(restaurant_id)
+    const { review_count, sum_of_ratings, ...restaurant } = await GetRestaurantById(restaurant_id)
     res.status(200).locals.sendEncryptedJson({
       code: 200,
       message: "restaurant found",
-      data: restaurant,
+      data: { ...restaurant, rating: sum_of_ratings / review_count },
     })
   }
 

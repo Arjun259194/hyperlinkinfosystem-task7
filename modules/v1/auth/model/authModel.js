@@ -16,53 +16,49 @@ export const FindAndDeleteDeviceByUserId = async id => {
 }
 
 export const NewUser = async (userData, addressData) => {
-  try {
-    const address = new Address(addressData)
-    await address.save()
+  console.log("🚀 ~ NewUser ~ userData:", userData)
+  const existingUser = await User.exists({ email: userData.email })
+  if (existingUser) throw new ErrorResponse("User with email already exists", 409)
 
-    const user = new User({
-      ...userData,
-      role: "User",
-      default_address: address._id,
-      addresses: [address._id],
-    })
+  const address = new Address(addressData)
+  await address.save()
 
-    await user.validate()
-    await user.save()
+  const user = new User({
+    ...userData,
+    role: "User",
+    default_address: address._id,
+    addresses: [address._id],
+  })
 
-    const { password, ...rest } = user.toObject()
-    return rest
-  } catch (error) {
-    console.error("Transaction failed:", error)
-    throw new ErrorResponse(error.message || "Failed to create user", 500)
-  }
+  await user.validate()
+  await user.save()
+
+  const { password, ...rest } = user.toObject()
+  return rest
 }
 
 export const NewChefAndRestaurant = async (chef_data, restaurant_data, address_data) => {
-  try {
-    const address = new Address(address_data)
-    await address.save()
+  const existingUser = await User.exists({ email: chef_data.email })
+  if (existingUser) throw new ErrorResponse("User with email already exists", 409)
+  const address = new Address(address_data)
+  await address.save()
 
-    const user = new User({
-      ...chef_data,
-      role: "Chef",
-    })
+  const user = new User({
+    ...chef_data,
+    role: "Chef",
+  })
 
-    await user.validate()
-    await user.save()
+  await user.validate()
+  await user.save()
 
-    const restaurant = new Restaurant(restaurant_data)
+  const restaurant = new Restaurant(restaurant_data)
 
-    restaurant.owner = user._id
-    restaurant.address_id = address._id
+  restaurant.owner = user._id
+  restaurant.address_id = address._id
 
-    await restaurant.validate()
-    await restaurant.save()
+  await restaurant.validate()
+  await restaurant.save()
 
-    const { password, ...rest } = user.toObject()
-    return rest
-  } catch (error) {
-    console.error("Transaction failed:", error)
-    throw new ErrorResponse(error.message || "Failed to create user", 500)
-  }
+  const { password, ...rest } = user.toObject()
+  return rest
 }

@@ -10,8 +10,9 @@ import User from "./models/User.js"
 import Restaurant from "./models/Restaurant.js"
 import PasswordHashing from "../libs/hash.js"
 import Device from "./models/Device.js"
-import Menu from "./models/Menu.js"
+import Menu, { Dish } from "./models/Menu.js"
 import Review from "./models/Review.js"
+import Cart from "./models/Cart.js"
 
 const categories = [
   { name: "Pizza" },
@@ -72,15 +73,16 @@ async function seedChefAndRestaurants() {
           is_available: faker.datatype.boolean({ probability: 0.7 }),
           ingredients: faker.helpers.arrayElements(
             ingredients.map(i => i.name),
-            { min: 3, max: 6 },
+            { min: 3, max: 6 }
           ),
           fruits: faker.helpers.arrayElements(
             fruits.map(f => f.name),
-            { min: 3, max: 6 },
+            { min: 3, max: 6 }
           ),
           category: faker.helpers.arrayElement(["Breakfast", "Lunch", "Dinner"]),
         }
       })
+    const createdDish = await Dish.insertMany(dishs)
 
     const chef = new User(chef_data)
 
@@ -96,7 +98,7 @@ async function seedChefAndRestaurants() {
 
     const menu = new Menu({
       restaurant: restaurant._id,
-      dishes: dishs,
+      dishes: createdDish.map(x => x._id),
     })
 
     await menu.validate()
@@ -152,7 +154,7 @@ async function seedUserAndReviews(rest_ids) {
         const newr = new Review(r)
         await newr.validate()
         await newr.save()
-      }),
+      })
     )
   }
 }
@@ -160,7 +162,7 @@ async function seedUserAndReviews(rest_ids) {
 async function seedDB() {
   try {
     await mongoose.connect(env.DATABASE_URI)
-    console.log("Connected to MongoDB")
+    console.log("\x1b[36m%s\x1b[0m", "✅ Connected to MongoDB\n")
 
     await Promise.all([
       Category.deleteMany({}),
@@ -172,17 +174,22 @@ async function seedDB() {
       Device.deleteMany({}),
       Menu.deleteMany({}),
       Review.deleteMany({}),
+      Cart.deleteMany({}),
     ])
 
-    console.log(`\nRemoved
-    \t [-] categories
-    \t [-] ingredients
-    \t [-] fruits
-    \t [-] devices
-    \t [-] 20 restaurants
-    \t [-] 20 addresses (of restaurants)
-    \t [-] 15 * 12 reviews (of restaurants)
-    \t [-] 20 chefs`)
+    console.log(
+      "\x1b[33m%s\x1b[0m",
+      "🚮 Removed existing data from collections:\n" +
+        "  - Categories\n" +
+        "  - Ingredients\n" +
+        "  - Fruits\n" +
+        "  - Devices\n" +
+        "  - *20 Restaurants\n" +
+        "  - *20 Addresses (restaurants)\n" +
+        "  - *180 Reviews (15 * 12)\n" +
+        "  - *20 Chefs\n" +
+        "  - Carts"
+    )
 
     await Promise.all([
       Category.insertMany(categories),
@@ -193,20 +200,23 @@ async function seedDB() {
     const rest_ids = await seedChefAndRestaurants()
     await seedUserAndReviews(rest_ids)
 
-    console.log(`\nseeded
-    \t [o] categories
-    \t [o] ingredients
-    \t [o] fruits
-    \t [o] 20 restaurants
-    \t [o] 8*20 Menu
-    \t [o] 20 chefs
-    \t [o] 7 users
-    \t [o] 15 * 12 reviews`)
+    console.log(
+      "\x1b[32m%s\x1b[0m",
+      "🎉 Seeded initial data successfully:\n" +
+        "  ✔ Categories\n" +
+        "  ✔ Ingredients\n" +
+        "  ✔ Fruits\n" +
+        "  ✔ 20 Restaurants\n" +
+        "  ✔ 160 Menus (8 * 20)\n" +
+        "  ✔ 20 Chefs\n" +
+        "  ✔ 7 Users\n" +
+        "  ✔ 180 Reviews (15 * 12)\n"
+    )
 
-    console.log("Seeding complete")
+    console.log("\x1b[36m%s\x1b[0m", "🌱 Seeding complete. Exiting.\n")
     process.exit(0)
   } catch (error) {
-    console.error("Error seeding DB:", error)
+    console.error("\x1b[31m%s\x1b[0m", "❌ Error seeding DB:", error)
     process.exit(1)
   }
 }

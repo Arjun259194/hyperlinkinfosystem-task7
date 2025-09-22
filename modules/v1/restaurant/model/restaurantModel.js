@@ -1,4 +1,5 @@
-import Menu from "../../../../database/models/Menu.js"
+import z from "zod"
+import Menu, { Dish } from "../../../../database/models/Menu.js"
 import Restaurant from "../../../../database/models/Restaurant.js"
 import Review from "../../../../database/models/Review.js"
 import User from "../../../../database/models/User.js"
@@ -12,11 +13,47 @@ export const GetRestaurantByOwnerId = async userId =>
       throw new ErrorResponse("Failed to fetch restaurants")
     })
 
+/**
+ *
+ * @param {z.infer<typeof import("../validation.js").restaurantSearchSchema >} params
+ */
+export const SearchRestaurant = async params => {
+  let query = {}
+
+  if (params.name) query.name = { $regex: params.name, $options: "i" }
+
+  if (params.city) query.city = params.city
+
+  if (params.state) query.state = params.state
+
+  if (params.is_open !== undefined) query.is_open = params.is_open
+
+  if (params.delivery_time !== undefined) query.delivery_time = { $lte: params.delivery_time }
+
+  if (params.min_price !== undefined || params.max_price !== undefined) {
+    query.delivery_fees = {}
+    if (params.min_price !== undefined) query.delivery_fees.$gte = params.min_price
+    if (params.max_price !== undefined) query.delivery_fees.$lte = params.max_price
+    if (Object.keys(query.delivery_fees).length === 0) delete query.delivery_fees
+  }
+
+  if (params.min_rating !== undefined) {
+    query.$expr = { $gte: [{ $divide: ["$sum_of_ratings", "$review_count"] }, params.min_rating] }
+  }
+
+  return await Restaurant.find(query)
+    .lean()
+    .catch(err => {
+      console.error("Error while searching user: ", err)
+      throw new ErrorResponse("Failed to search user in database", 500)
+    })
+}
+
 export const GetRestaurantsAsPerUser = async (userId, page, limit) => {
   try {
     const user = await User.findOne({ _id: userId }).populate("default_address").exec() // includes address
-    console.info("🚀 ~ GetRestaurantsAsPerUser ~ user:", user)
     if (!user) throw new ErrorResponse("Not User found", 404)
+
     const userCoordinates = user.default_address.location.coordinates
 
     const restaurants = await Restaurant.aggregate([
@@ -47,7 +84,10 @@ export const GetRestaurantsAsPerUser = async (userId, page, limit) => {
 export const GetRestaurantById = async id => {
   const restaurant = await Restaurant.findOne({ _id: id })
     .populate("reviews")
-    .populate("menu")
+    .populate({
+      path: "menu",
+      populate: "dishes",
+    })
     .populate({
       path: "owner",
       select: "-password -otp",
@@ -80,25 +120,32 @@ export const WriteReview = async (userId, rest_id, content, rating) => {
 
 export const CreateDish = async (
   rest_id,
-  { name, price, image, is_veg, is_available, ingredients, fruits, category },
-) =>
-  await Menu.findOneAndUpdate(
+  { name, price, image, is_veg, is_available, ingredients, fruits, category }
+) => {
+  const dish = new Dish({
+    name,
+    price,
+    image,
+    is_veg,
+    is_available,
+    ingredients,
+    fruits,
+    category,
+  })
+
+  await dish.save()
+
+  return await Menu.findOneAndUpdate(
     {
       restaurant: rest_id,
     },
     {
       $push: {
-        dishes: {
-          name,
-          price,
-          image,
-          is_veg,
-          is_available,
-          ingredients,
-          fruits,
-          category,
-        },
+        dishes: dish._id,
       },
     },
-    { new: true, upsert: true },
+    { new: true, upsert: true }
   )
+    .populate("dishes")
+    .exec()
+}

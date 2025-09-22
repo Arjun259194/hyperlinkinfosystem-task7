@@ -16,3 +16,14 @@ export const dishSchema = z.object({
   fruits: z.array(z.string()),
   category: z.string(),
 })
+
+export const restaurantSearchSchema = z.object({
+  name: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  is_open: z.coerce.boolean().optional(),
+  delivery_time: z.coerce.number().int().min(1).optional(),
+  min_price: z.coerce.number().min(0).optional(),
+  max_price: z.coerce.number().min(0).optional(),
+  min_rating: z.coerce.number().min(0).max(5).optional(),
+})
