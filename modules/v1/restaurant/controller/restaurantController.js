@@ -4,6 +4,7 @@ import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
 import { PaginationValidation } from "../../validation.js"
 import {
   CreateDish,
+  deleteDish,
   GetRestaurantById,
   GetRestaurantByOwnerId,
   GetRestaurantsAsPerUser,
@@ -101,5 +102,13 @@ export default class RestaurantController {
       message: "Updated",
       data: updated,
     })
+  }
+
+  /**@type {ExpressFn} */
+  static async removeDish(req, res) {
+    if (!req.userId) throw new ErrorResponse("User Id not found", 401)
+    const dish_id = Validate(z.string(), req.body?.dish_id)
+    await deleteDish(req.userId, dish_id)
+    res.sendStatus(204)
   }
 }

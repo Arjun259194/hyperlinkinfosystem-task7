@@ -4,7 +4,6 @@ import Restaurant from "../../../../database/models/Restaurant.js"
 import Review from "../../../../database/models/Review.js"
 import User from "../../../../database/models/User.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
-import mongoose from "mongoose"
 
 export const GetRestaurantByOwnerId = async userId =>
   await Restaurant.findOne({ owner: userId })
@@ -126,6 +125,7 @@ export const CreateDish = async (
     ingredients,
     fruits,
     category,
+    restaurant: rest_id,
   })
 
   await dish.save()
@@ -166,4 +166,21 @@ export const updateDish = async (user_id, dish_id, update) => {
   console.log("🚀 ~ updateDish ~ updated:", updated)
   if (!updated) throw new ErrorResponse("No dish found", 404)
   return updated
+}
+
+export const deleteDish = async (user_id, dish_id) => {
+  const restaurant = await Restaurant.findOne({ owner: user_id }).exec()
+  if (!restaurant) throw new ErrorResponse("Restaurant not found under your ownership", 401)
+
+  const menu = await Menu.findOne({ restaurant: restaurant._id }).exec()
+  if (!menu) throw new ErrorResponse("No manu was found!", 404)
+
+  if (!menu.dishes.some(x => x._id.toString() === dish_id)) {
+    throw new ErrorResponse("No dish found in you menu", 404)
+  }
+
+  const removed = await Dish.findOneAndDelete({ _id: dish_id }).lean()
+  if (!removed) throw new ErrorResponse("dish not found", 404)
+
+  return removed
 }

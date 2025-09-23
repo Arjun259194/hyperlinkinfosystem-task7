@@ -2,7 +2,15 @@ import Cart from "../../../../database/models/Cart.js"
 import ErrorResponse from "../../../../middleware/globalErrorHandler.js"
 
 export const GetCart = async userId => {
-  let cart = await Cart.findOne({ user: userId }).populate("items.dish").lean()
+  let cart = await Cart.findOne({ user: userId })
+    .populate({
+      path: "items.dish",
+      populate: {
+        path: "restaurant",
+        select: "name _id phone address street state pin_code",
+      },
+    })
+    .lean()
 
   if (!cart) throw new ErrorResponse("User cart not found", 404)
 
@@ -23,7 +31,7 @@ export const AddToCart = async (user_id, dish_id) => {
     {
       new: true,
       upsert: true,
-    },
+    }
   ).exec()
 
   return cart.toObject()
@@ -33,7 +41,7 @@ export const UpdateQuantity = async (userId, cartItemId, quantity) => {
   const updatedCart = await Cart.findOneAndUpdate(
     { user: userId, "items._id": cartItemId },
     { $inc: { "items.$.quantity": quantity } },
-    { new: true },
+    { new: true }
   ).exec()
   if (!updatedCart) throw new ErrorResponse("Cart not found", 404)
   return updatedCart.toObject()
@@ -47,6 +55,6 @@ export const RemoveCartItem = async (userId, cartItemId) => {
         items: { dish: cartItemId },
       },
     },
-    { new: true },
+    { new: true }
   ).lean()
 }

@@ -9,6 +9,7 @@ restaurantRouter.get("/detailed", RestaurantController.getById)
 restaurantRouter.post("/review", AllowRole("User"), RestaurantController.writeReview)
 restaurantRouter.post("/dish", AllowRole("Chef"), RestaurantController.addDish)
 restaurantRouter.put("/dish", AllowRole("Chef"), RestaurantController.updateDish)
+restaurantRouter.delete("/dish", AllowRole("Chef"), RestaurantController.removeDish)
 restaurantRouter.get("/search", RestaurantController.search)
 
 export default restaurantRouter

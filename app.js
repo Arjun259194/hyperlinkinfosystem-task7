@@ -13,6 +13,7 @@ import restaurantRouter from "./modules/v1/restaurant/route/restaurantRoute.js"
 import addressRouter from "./modules/v1/address/route/addressRoute.js"
 import cartRouter from "./modules/v1/cart/route/cartRoute.js"
 import userRouter from "./modules/v1/user/route/userRoute.js"
+import orderRouter from "./modules/v1/order/route/orderRoute.js"
 
 const IS_DEV_ENV = process.env.NODE_ENV !== "production"
 
@@ -41,6 +42,7 @@ v1.use("/restaurant", decryptRequest, verifyToken, restaurantRouter)
 v1.use("/address", decryptRequest, verifyToken, addressRouter)
 v1.use("/cart", decryptRequest, verifyToken, cartRouter)
 v1.use("/user", decryptRequest, verifyToken, userRouter)
+v1.use("/order", decryptRequest, verifyToken, orderRouter)
 
 app.use("/api/v1", v1)
 

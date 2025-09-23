@@ -13,6 +13,7 @@ import Device from "./models/Device.js"
 import Menu, { Dish } from "./models/Menu.js"
 import Review from "./models/Review.js"
 import Cart from "./models/Cart.js"
+import Order from "./models/Order.js"
 
 const categories = [
   { name: "Pizza" },
@@ -62,6 +63,18 @@ async function seedChefAndRestaurants() {
       longitude: faker.location.longitude(),
     }
 
+    const chef = new User(chef_data)
+
+    await chef.validate()
+    await chef.save()
+
+    const restaurant = new Restaurant(restaurant_data)
+
+    restaurant.owner = chef._id
+
+    await restaurant.validate()
+    await restaurant.save()
+
     const dishs = Array(8)
       .fill({})
       .map(() => {
@@ -71,6 +84,7 @@ async function seedChefAndRestaurants() {
           image: faker.image.url(),
           is_veg: faker.datatype.boolean({ probability: 0.5 }),
           is_available: faker.datatype.boolean({ probability: 0.7 }),
+          restaurant: restaurant._id,
           ingredients: faker.helpers.arrayElements(
             ingredients.map(i => i.name),
             { min: 3, max: 6 }
@@ -83,18 +97,6 @@ async function seedChefAndRestaurants() {
         }
       })
     const createdDish = await Dish.insertMany(dishs)
-
-    const chef = new User(chef_data)
-
-    await chef.validate()
-    await chef.save()
-
-    const restaurant = new Restaurant(restaurant_data)
-
-    restaurant.owner = chef._id
-
-    await restaurant.validate()
-    await restaurant.save()
 
     const menu = new Menu({
       restaurant: restaurant._id,
@@ -166,7 +168,9 @@ async function seedDB() {
 
     await Promise.all([
       Category.deleteMany({}),
+      Order.deleteMany({}),
       Ingredient.deleteMany({}),
+      Dish.deleteMany({}),
       Fruit.deleteMany({}),
       Restaurant.deleteMany({}),
       Address.deleteMany({}),

@@ -1,33 +1,22 @@
 import mongoose from "mongoose"
 
-const orderItemSchema = new mongoose.Schema(
-  {
-    dish_id: {
-      type: mongoose.Types.ObjectId,
-      ref: "Dish",
-      required: true,
-    },
-    name: { type: String, required: true }, // Store name for snapshot
-    quantity: { type: Number, required: true, min: 1 },
-    unit_price: { type: Number, required: true },
-    total_price: { type: Number, required: true },
-    special_instructions: String,
+const orderItemSchema = new mongoose.Schema({
+  dish_id: {
+    type: mongoose.Types.ObjectId,
+    ref: "Dish",
+    required: true,
   },
-  {
-    _id: false, // optional: don't create separate _id for items
-  },
-)
+  name: { type: String, required: true }, // Store name for snapshot
+  quantity: { type: Number, required: true, min: 1 },
+  delivery_fee: Number,
+  total_price: { type: Number, required: true },
+})
 
 const orderSchema = new mongoose.Schema(
   {
-    user_id: {
+    user: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      required: true,
-    },
-    restaurant_id: {
-      type: mongoose.Types.ObjectId,
-      ref: "Restaurant",
       required: true,
     },
 
@@ -41,8 +30,6 @@ const orderSchema = new mongoose.Schema(
 
     subtotal: { type: Number, required: true },
     delivery_fee: { type: Number, default: 0 },
-    tax_amount: { type: Number, default: 0 },
-    discount_amount: { type: Number, default: 0 },
     total_amount: { type: Number, required: true },
 
     payment_method: {
@@ -69,15 +56,10 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "pending",
     },
-
-    estimated_delivery_time: Date,
-    actual_delivery_time: Date,
-
-    special_instructions: String,
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-  },
+  }
 )
 
 const Order = mongoose.model("Order", orderSchema)
